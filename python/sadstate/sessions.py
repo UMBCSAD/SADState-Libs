@@ -12,6 +12,7 @@ def _b64_id(id:str):
     return int.from_bytes(base64.b64decode(id.encode("utf-8")), "little")
 
 class Session:
+    "Carries out standalone API calls and handles all requested resources."
 
     def __init__(self, host:str):
         self.host = host
@@ -20,9 +21,11 @@ class Session:
         self._cached:dict[int, projects.Project|profiles.Profile] = {}
 
     def clear_cache(self):
+        "Clears the cache of all constructed objects."
         self._cached.clear()
 
     def new_auth(self, password:str):
+        "Creates a new Auth ID given a password."
         r = self._s.post(f"{self.host}/auth/new", data={"password":password})
         if r.status_code == 200:
             id = int(r.text)
@@ -36,6 +39,7 @@ class Session:
             return responses.UnexpectedErrorResponse(r)
 
     def authenticate(self, id:int, password:str):
+        "Authenticates the session given an Auth ID and password."
         r = self._s.post(f"{self.host}/auth/set", data={"id":id, "password":password})
         if r.status_code == 200:
             if id != self.auth_id:
@@ -48,6 +52,7 @@ class Session:
             return responses.UnexpectedErrorResponse(r)
         
     def get_project(self, name:str):
+        "Gets a Project with the given name."
         r = self._s.get(f"{self.host}/project/get?name={_param(name)}")
         if r.status_code == 200:
             data = r.json()
@@ -66,6 +71,7 @@ class Session:
             return responses.UnexpectedErrorResponse(r)
 
     def register_project(self, name:str, permissions:dict[int, permissions_.ProjectPermissions]=None, **fields):
+        "Registers a new Project."
         fields["permissions"] = None if permissions is None else {auth_id:perm.value for auth_id, perm in permissions.items()}
         r = self._s.post(f"{self.host}/project/register", data={
             "name":name,

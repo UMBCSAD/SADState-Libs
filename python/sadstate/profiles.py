@@ -4,11 +4,13 @@ import json
 import weakref
 
 class Profile:
+    "Allows for making API calls having to do with an individual Profile."
 
     __slots__ = "id", "name", "permissions", "_project", "_session", "__weakref__"
 
     @classmethod
     def from_data(cls, data:dict[str], project:"projects.Project", session:"sessions.Session"):
+        "Construct a new Profile object from response data."
         instance = cls.__new__(cls)
         instance._project = weakref.ref(project)
         instance._session = weakref.ref(session)
@@ -31,6 +33,11 @@ class Profile:
         self._project = weakref.ref(project)
         self._session = weakref.ref(session)
 
+    def __eq__(self, other):
+        if isinstance(other, Profile):
+            return other.name == self.name
+        return super().__eq__(other)
+
     @property
     def project(self):
         return self._project()
@@ -40,6 +47,7 @@ class Profile:
         return self._session()
     
     def update(self):
+        "Update this Profile object with the latest data on the server."
         r = self.session._s.get(f"{self.session.host}/project/profile/get?name={sessions._param(self.project.name)}&profile_name={sessions._param(self.name)}")
         if r.status_code == 200:
             self._from_data(r.json())
@@ -52,12 +60,15 @@ class Profile:
             return responses.UnexpectedErrorResponse(r)
         
     def remove(self):
+        "Delete this Profile and remove it from its Project."
         resp = self.project.remove_profile(self.name)
         if isinstance(resp, (responses.SuccessResponse, responses.NotFoundResponse)):
             self.session._cached.pop(self.id, None)
         return resp
     
     def edit(self, name:str=None, permissions:dict[int, permissions_.ProfilePermissions]=None, **fields):
+        "Edit this Profile's attributes (e.g. name, permissions)."
+
         fields["name"] = name
         fields["permissions"] = {id:perm.value for id, perm in permissions.items()}
         r = self.session._s.post(f"{self.session.host}/project/edit", data={
@@ -90,6 +101,7 @@ class Profile:
             return responses.UnexpectedErrorResponse(r)
 
     def read(self):
+        "Read this Profile's contents."
         r = self.session._s.get(f"{self.session.host}/project/profile/read?name={sessions._param(self.project.name)}&profile_name={sessions._param(self.name)}")
         if r.status_code == 200:
             return responses.ProfileContentResponse(r)
@@ -101,9 +113,11 @@ class Profile:
             return responses.UnexpectedErrorResponse(r)
     
     def write(self, b:bytes|io.IOBase):
+        "Write to this Profile's contents."
         return _profile_write(self, b, f"{self.session.host}/project/profile/write")
 
     def append(self, b:bytes|io.IOBase):
+        "Append to this Profile's contents."
         return _profile_write(self, b, f"{self.session.host}/project/profile/append")
 
 

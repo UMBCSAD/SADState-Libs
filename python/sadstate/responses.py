@@ -4,7 +4,7 @@ import requests
 
 @dataclass(slots=True)
 class Response:
-    ""
+    "Base class for API responses."
     response:requests.Response
 
     @property
@@ -29,21 +29,21 @@ class Response:
 #ok responses
 
 class SuccessResponse(Response):
-    ""
+    "A successful response."
 
 @dataclass(slots=True)
 class AuthResponse(SuccessResponse):
-    ""
+    "A response containing an Auth ID."
     id:int
 
 @dataclass(slots=True)
 class ProjectResponse(SuccessResponse):
-    ""
+    "A response containing a Project."
     project:"projects.Project"
 
 @dataclass(slots=True)
 class ProfileResponse(SuccessResponse):
-    ""
+    "A response containing one or more Profiles."
     profiles:"list[profiles.Profile]"
 
     @property
@@ -52,13 +52,13 @@ class ProfileResponse(SuccessResponse):
     
 @dataclass(slots=True)
 class RemainingSpaceResponse(SuccessResponse):
-    ""
+    "A response containing the number of bytes left unused in a Profile."
 
     num_bytes:int
 
     
 class ProfileContentResponse(SuccessResponse):
-    ""
+    "A response containing the contents of a Profile."
 
     @property
     def content(self):
@@ -67,28 +67,28 @@ class ProfileContentResponse(SuccessResponse):
 
 #not ok responses
 class ErrorResponse(Response):
-    ""
+    "An unsuccessful response."
 
     @property
     def reason(self):
         return self.response.text
 
 class UnexpectedErrorResponse(ErrorResponse):
-    ""
+    "A response indicating that an unexpected error occured."
 
 class NotFoundResponse(ErrorResponse):
-    ""
+    "A response indicating that the requested resource could not be found."
 
 class AlreadyExistsResponse(ErrorResponse):
-    ""
+    "A response indicating that the provided resource already exists on the server."
 
 @dataclass(slots=True)
 class InvalidPermissionResponse(ErrorResponse):
-    ""
+    "A containing the permissions needed to carry out the attempted action."
     value:"permissions.ProjectPermissions|permissions.ProfilePermissions"
 
 class InvalidInputResponse(ErrorResponse):
-    ""
+    "A response indicating that the proper values were not used when creating the request."
     
 class InvalidAuthResponse(ErrorResponse):
-    ""
+    "A response indicating that the session has not been authenticated."

@@ -6,6 +6,8 @@ def _flag_all(cls:type[Flag])->Flag:
     return cls(reduce(lambda a,b: a|b, cls))
 
 class ProjectPermissions(Flag):
+    "Permissions group for Projects."
+
     EDIT            = 0b000001
     DELETE          = 0b000010
     VIEW            = 0b000100
@@ -23,6 +25,8 @@ class ProjectPermissions(Flag):
         return _flag_all(cls)
 
 class ProfilePermissions(Flag):
+    "Permissions group for Profiles."
+
     READ            = 0b001
     WRITE           = 0b010
     EDIT            = 0b100

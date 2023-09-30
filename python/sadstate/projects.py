@@ -3,11 +3,13 @@ import json
 import weakref
 
 class Project:
+    "Allows for making API calls having to do with an individual Project."
 
     __slots__ = "id", "name", "permissions", "_session", "__weakref__"
 
     @classmethod
     def from_data(cls, data:dict[str], session:"sessions.Session"):
+        "Construct a new Project object from response data."
         instance = cls.__new__(cls)
         instance._session = weakref.ref(session)
         instance._from_data(data)
@@ -38,6 +40,7 @@ class Project:
         return super().__eq__(other)
     
     def update(self):
+        "Update this Project object with the latest data on the server."
         r = self.session._s.get(f"{self.session.host}/project/get?name={sessions._param(self.name)}")
         if r.status_code == 200:
             data:dict[str] = r.json()
@@ -51,6 +54,7 @@ class Project:
             return responses.UnexpectedErrorResponse(r)
     
     def edit(self, name:str=None, permissions:dict[int, permissions_.ProjectPermissions]=None, **fields):
+        "Edit this Project's attributes (e.g. name, permissions)."
         fields["name"] = name
         fields["permissions"] = {id:perm.value for id, perm in permissions.items()}
         r = self.session._s.post(f"{self.session.host}/project/edit", data={
@@ -83,6 +87,7 @@ class Project:
         
 
     def delete(self):
+        "Delete this Project and all of its Profiles."
         r = self.session._s.delete(f"{self.session.host}/project/delete?name={sessions._param(self.name)}")
         if r.status_code == 200:
             self.session._cached.pop(self.id, None)
@@ -96,6 +101,7 @@ class Project:
         
 
     def get_profile(self, name:str):
+        "Get a Profile belonging to this Project."
         r = self.session._s.get(f"{self.session.host}/project/profile/get?name={sessions._param(self.name)}&profile_name={sessions._param(name)}")
         if r.status_code == 200:
             data = r.json()
@@ -114,6 +120,7 @@ class Project:
             return responses.UnexpectedErrorResponse(r)
         
     def get_all_profiles(self):
+        "Get all Profiles belonging to this Project."
         r = self.session._s.get(f"{self.session.host}/project/profile/all?name={sessions._param(self.name)}")
         if r.status_code == 200:
             return responses.ProfileResponse(r, [profiles.Profile.from_data(data, self, self.session) for data in r.json()])
@@ -123,6 +130,7 @@ class Project:
             return responses.UnexpectedErrorResponse(r)
         
     def add_profile(self, name:str, permissions:dict[int, permissions_.ProfilePermissions]=None, **fields):
+        "Add a Profile to this Project."
         fields["permissions"] = None if permissions is None else {auth_id:perm for auth_id, perm in permissions.items()}
         r = self.session._s.post(f"{self.session.host}/project/profile/add", data={
             "name":self.name,
@@ -144,6 +152,7 @@ class Project:
             return responses.UnexpectedErrorResponse(r)
         
     def remove_profile(self, name:str):
+        "Remove the Profile with the given name from this Project."
         r = self.session._s.post(f"{self.session.host}/project/profile/remove?name={sessions._param(self.name)}&profile_name={sessions._param(name)}")
         if r.status_code == 200:
             return responses.SuccessResponse(r)
