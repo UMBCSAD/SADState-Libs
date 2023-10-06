@@ -1,4 +1,4 @@
-from . import permissions as permissions_, profiles, responses, sessions
+from . import exceptions, permissions as permissions_, profiles, responses, sessions
 import json
 import weakref
 
@@ -44,6 +44,9 @@ class Project:
         r = self.session._s.get(f"{self.session.host}/project/get?name={sessions._param(self.name)}")
         if r.status_code == 200:
             data:dict[str] = r.json()
+            if data["id"] != self.id:
+                self.session._cached.pop(self.id)
+                raise exceptions.OutOfDateException(f"Project {self.name} has changed its name.")
             self._from_data(data)
             return responses.SuccessResponse(r)
         elif r.status_code == 403:

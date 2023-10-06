@@ -1,4 +1,4 @@
-from . import permissions as permissions_, projects, responses, sessions
+from . import exceptions, permissions as permissions_, projects, responses, sessions
 import io
 import json
 import weakref
@@ -50,7 +50,11 @@ class Profile:
         "Update this Profile object with the latest data on the server."
         r = self.session._s.get(f"{self.session.host}/project/profile/get?name={sessions._param(self.project.name)}&profile_name={sessions._param(self.name)}")
         if r.status_code == 200:
-            self._from_data(r.json())
+            data = r.json()
+            if data["id"] != self.id:
+                self.session._cached.pop(self.id)
+                raise exceptions.OutOfDateException(f"Project {self.name} has changed its name.")
+            self._from_data()
             return responses.SuccessResponse(r)
         elif r.status_code == 403:
             return responses.InvalidPermissionResponse(r, permissions_.ProjectPermissions.VIEW)
