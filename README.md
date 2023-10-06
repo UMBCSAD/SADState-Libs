@@ -16,7 +16,7 @@
 | Language | Folder | Status |
 | --- | --- | -- |
 | Python | [python](python/) | Supported (Testing) |
-| Java | java | Not Started |
+| Java | [java](java/) | Incomplete |
 | C# | csharp | Not Started |
 | C++ | cpp | Not Started |
 

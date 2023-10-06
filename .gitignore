@@ -1,3 +1,9 @@
+#python ignore
 __pycache__/
+*.py[cod]
 *.egg-info/
 /python/build/
+
+#java ignore
+/java/sadstate/target
+/java/jars/

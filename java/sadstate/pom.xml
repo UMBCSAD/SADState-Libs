@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>club.umbcsad.sadstate</groupId>
+    <artifactId>sadstate</artifactId>
+    <version>1.0</version>
+
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>Java Library for using SADState API.</description>
+    <packaging>jar</packaging>
+
+    <properties>
+        <maven.compiler.source>1.17</maven.compiler.source>
+        <maven.compiler.target>1.17</maven.compiler.target>
+    </properties>
+
+
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.liferay</groupId>
+            <artifactId>com.fasterxml.jackson.annotations</artifactId>
+            <version>2.10.3.LIFERAY-PATCHED-1</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.liferay</groupId>
+            <artifactId>com.fasterxml.jackson.core</artifactId>
+            <version>2.10.3.LIFERAY-PATCHED-1</version>
+        </dependency>
+
+    
+
+        <dependency>
+            <groupId>com.liferay</groupId>
+            <artifactId>com.fasterxml.jackson.databind</artifactId>
+            <version>2.10.5.1.LIFERAY-PATCHED-1</version>
+        </dependency>
+
+    </dependencies>
+</project>
